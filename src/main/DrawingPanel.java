@@ -14,8 +14,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Ellipse2D.Double;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.AttributedString;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class DrawingPanel extends JPanel {
@@ -35,9 +39,11 @@ public class DrawingPanel extends JPanel {
     
     /**	length of the entered string*/
     private int entryStringLenght;
-    
-    /**	current state*/
-    private int currentState;
+
+
+    private boolean endState;
+
+    private BufferedImage endImage;
     
     /**
      * 
@@ -49,22 +55,35 @@ public class DrawingPanel extends JPanel {
     	this.setSize(new Dimension(width, height));
     	statesColor = new Color[12];
     	
-    	this.currentState = 0;
     	for(int i = 0; i<4; i++) {
     		statesColor[i] = Color.red;
     	}
     	for(int i = 4; i< statesColor.length; i++) {
     		statesColor[i] = Color.WHITE;
     	}
+		try {
+			endImage = ImageIO.read(new File("end.jpg"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		;
+
     	
     }
-    @Override
+
+	public void setEndState(boolean endState) {
+		this.endState = endState;
+	}
+
+	@Override
     public void paint(Graphics g) {
     	super.paint(g);
     	
     	this.g2 = (Graphics2D) g;
-    	
-    	System.out.println("Vstup: "+this.entryString);
+
+    	if(endState)
+    		g2.drawImage(endImage,0,0,this.getWidth(),this.getHeight()-40,null);
+    	//System.out.println("Vstup: "+this.entryString);
     	int arrowsTip = 10;
     	int statesSize = 30;
     	AffineTransform original = g2.getTransform();
@@ -253,52 +272,10 @@ public class DrawingPanel extends JPanel {
 		g2.setStroke(original);
 		
 	}
-	
-	/**
-	 * According to input string change active states
-	 * @param inputString	string of the input
-	 */
-	public void changeColor(String inputString) {
-		
-		this.entryString = inputString;
-		
-		this.entryStringLenght = inputString.length();
-		
-		String newChar = inputString.substring(inputString.length() - 1);
-		
-		switch(inputString) {
-		case "a":
-			for(int i = 0; i< this.statesColor.length; i++) {
-				this.statesColor[i] = Color.WHITE;
-			}
-			this.statesColor[0] = Color.RED;
-			this.statesColor[1] = Color.RED;
-			this.statesColor[3] = Color.RED;
-			break;
-		case "b":
-			for(int i = 0; i< this.statesColor.length; i++) {
-				this.statesColor[i] = Color.WHITE;
-			}
-			this.statesColor[0] = Color.RED;
-			this.statesColor[2] = Color.RED;
-			this.statesColor[3] = Color.RED;
-			break;
-		case "ab":
-			for(int i = 0; i< this.statesColor.length; i++) {
-				this.statesColor[i] = Color.WHITE;
-			}
-			this.statesColor[0] = Color.RED;
-			this.statesColor[2] = Color.RED;
-			this.statesColor[3] = Color.RED;
-			this.statesColor[4] = Color.RED;
-			break;
-		default:
-			for(int i = 0; i< this.statesColor.length; i++) {
-				this.statesColor[i] = Color.WHITE;
-			}
-			break;
-			
-		}
+
+
+	public void setColors(Color[] colors){
+		this.statesColor=colors;
 		repaint();
 	}
     
