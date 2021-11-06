@@ -2,63 +2,80 @@ package main;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import java.awt.geom.Ellipse2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.AttributedString;
+import java.io.Serial;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+/**
+ * Class drawing panel takes care of drawing of the image
+ */
 public class DrawingPanel extends JPanel {
 
-    // Bez nasledujici definice hlasi prekladac "warning".
-    // Tzv. serializaci resit nebudeme, vyuzijeme standardni reseni.
-    private static final long serialVersionUID = 1L;
+    @Serial
+	private static final long serialVersionUID = 1L;
 
-    /**	color of the states */
+	/**	radius of the states circle */
+	private final int STATES_R = 30;
+
+	/**	how many space between center of two states */
+	private final int SPACE_BETWEEN_SPACE_LINE = 100;
+
+	/**	y-coordinate of the center of the image */
+	private final int MIDST_Y = 200;
+
+	/**	how much from midst can be center of the state draw*/
+	private final int LIMIT_Y_FROM_MIDST = 100;
+
+	/**	width necessary for drawing an image */
+	private final int width;
+
+	/**	height necessary for drawing an image */
+	private final int height;
+
+	/**	color of the states */
     public Color[] statesColor;
     
     /** Graphics2D  */
     public Graphics2D g2;
-    
-    /**	entry string */
-    public String entryString;
-    
-    /**	length of the entered string*/
-    private int entryStringLenght;
 
-
+	/**	true - is an end state, otherwise false */
     private boolean endState;
 
+	/**	image used on the background during end state*/
     private BufferedImage endImage;
-    
+
+
     /**
-     * 
-     * @param width		width of the panel
-     * @param height	height of the drawing panel
+     * Create instance of the drawing panel
      */
-    public DrawingPanel(int width, int height) {
-    	this.setMinimumSize(new Dimension(800, 400));
-    	this.setSize(new Dimension(width, height));
-    	statesColor = new Color[12];
-    	
-    	for(int i = 0; i<4; i++) {
+    public DrawingPanel() {
+
+		// how many states are going to be drawn
+		int drawStates = 12;
+
+		this.width = SPACE_BETWEEN_SPACE_LINE * (drawStates -1);
+		this.height = MIDST_Y+ (LIMIT_Y_FROM_MIDST + STATES_R)*2;
+    	this.setMinimumSize(new Dimension( this.width , this.height));
+    	this.setSize(new Dimension( this.width , this.height));
+    	statesColor = new Color[drawStates];
+
+		int firstActive = 4;
+
+    	for(int i = 0; i<firstActive; i++) {
     		statesColor[i] = Color.red;
     	}
-    	for(int i = 4; i< statesColor.length; i++) {
+    	for(int i = firstActive; i< statesColor.length; i++) {
     		statesColor[i] = Color.WHITE;
     	}
 		try {
@@ -66,11 +83,26 @@ public class DrawingPanel extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		;
-
     	
     }
 
+	/**
+	 * @return	width of the image
+	 */
+	public int getWidth(){
+		return this.width;
+	}
+
+	/**
+	 * @return	height of the image
+	 */
+	public int getHeight(){
+		return this.height;
+	}
+
+	/**
+	 * @param endState	status of end state
+	 */
 	public void setEndState(boolean endState) {
 		this.endState = endState;
 	}
@@ -78,79 +110,109 @@ public class DrawingPanel extends JPanel {
 	@Override
     public void paint(Graphics g) {
     	super.paint(g);
-    	
     	this.g2 = (Graphics2D) g;
 
     	if(endState)
     		g2.drawImage(endImage,0,0,this.getWidth(),this.getHeight()-40,null);
-    	//System.out.println("Vstup: "+this.entryString);
-    	int arrowsTip = 10;
-    	int statesSize = 30;
+
+
+		int arrowsTip = 10;
+    	int statesSize = STATES_R;
+
+		int spaceBetweenStatesInLine = SPACE_BETWEEN_SPACE_LINE;
+		int shortArrowLength = spaceBetweenStatesInLine-statesSize;
+
+		int midstOfImage = MIDST_Y;
+
+		int toTopFromMidst = -LIMIT_Y_FROM_MIDST;
+
+		int toBottomOfImageFromTop = 200;
+
+		int toMidstFromBottom = -100;
+
+		//x is always +, when going up y is -, when going down y is +
+		double xYFromBottomToTop = 22;
+
+		//x is always +, when going from bottom y is -, when going from up y is +
+		int xYFromTopToBottom = 79;
+
     	AffineTransform original = g2.getTransform();
-    	//prvni ctyri vztahy
-    	drawArrow(10, 200, 100-statesSize, 200, arrowsTip,"e", g2);
-    	g2.translate(100, 200);
-    	drawArrow(22, -22, 79, -79, arrowsTip,"e", g2);
-    	drawArrow(22, 22, 79, 79, arrowsTip,"e", g2);
+
+		//first four states
+		// representation of an empty transition
+		String emptyTransition = "e";
+
+		String a_transition = "a";
+		String b_transition = "b";
+		
+		
+		drawArrow(statesSize, midstOfImage, shortArrowLength, midstOfImage, arrowsTip, emptyTransition, g2);
+    	g2.translate(spaceBetweenStatesInLine, midstOfImage);
+    	drawArrow(xYFromBottomToTop, -xYFromBottomToTop, xYFromTopToBottom, -xYFromTopToBottom, arrowsTip, emptyTransition, g2);
+    	drawArrow(xYFromBottomToTop, xYFromBottomToTop, xYFromTopToBottom, xYFromTopToBottom, arrowsTip, emptyTransition, g2);
     	drawState(g2, statesSize, 0);
     	    	
     	
-    	g2.translate(100, -100);
-    	drawArrow(22, 22, 79, 79, arrowsTip,"e", g2);
-    	drawCycleArrow(g2, statesSize, "a", -statesSize );
+    	g2.translate(spaceBetweenStatesInLine, toTopFromMidst);
+    	drawArrow(xYFromBottomToTop, xYFromBottomToTop, xYFromTopToBottom, xYFromTopToBottom, arrowsTip, emptyTransition, g2);
+
+		drawCycleArrow(g2, statesSize, a_transition, -statesSize, arrowsTip );
     	drawState(g2, statesSize, 1);
     	
-    	g2.translate(0, 200);
-    	drawArrow(22, -22, 79, -79, arrowsTip,"e", g2);
-    	drawCycleArrow(g2, statesSize, "b", statesSize );
+    	g2.translate(0, toBottomOfImageFromTop);
+    	drawArrow(xYFromBottomToTop, -xYFromBottomToTop, xYFromTopToBottom, -xYFromTopToBottom, arrowsTip, emptyTransition, g2);
+		
+		drawCycleArrow(g2, statesSize, b_transition, statesSize, arrowsTip );
     	drawState(g2, statesSize, 2);
     	
-    	g2.translate(100, -100);
+    	g2.translate(spaceBetweenStatesInLine, toMidstFromBottom);
     	drawState(g2, statesSize, 3);
-    	//konec prvnich 4 vztahu
+    	//end of the first four states
     	
-    	//DLOUHA LINE
-    	drawArrow(30, 0, 70, 0, arrowsTip, "a", g2);
-    	g2.translate(100, 0);
+
+		//LONG LINE of states
+    	drawArrow(statesSize, 0, shortArrowLength, 0, arrowsTip, a_transition, g2);
+    	g2.translate(spaceBetweenStatesInLine, 0);
     	drawState(g2, statesSize, 4);
     	
-    	drawArrow(30, 0, 70, 0, arrowsTip, "b", g2);
-    	g2.translate(100, 0);
+    	drawArrow(statesSize, 0, shortArrowLength, 0, arrowsTip, b_transition, g2);
+    	g2.translate(spaceBetweenStatesInLine, 0);
     	drawState(g2, statesSize, 5);
     	
-    	drawArrow(30, 0, 70, 0, arrowsTip, "a", g2);
-    	g2.translate(100, 0);
+    	drawArrow(statesSize, 0, shortArrowLength, 0, arrowsTip, a_transition, g2);
+    	g2.translate(spaceBetweenStatesInLine, 0);
     	drawState(g2, statesSize, 6);
     	
-    	drawArrow(30, 0, 70, 0,arrowsTip, "b", g2);
-    	g2.translate(100, 0);
+    	drawArrow(statesSize, 0, shortArrowLength, 0,arrowsTip, b_transition, g2);
+    	g2.translate(spaceBetweenStatesInLine, 0);
     	drawState(g2, statesSize, 7);
-    	
+    	//end of the line of states
     
-    	//posledni 4
-    	//prvni ctyri vztahy
-    	drawArrow(30, 0, 100-statesSize, 0, arrowsTip,"a", g2);
-    	g2.translate(100, 0);
-    	drawArrow(22, -22, 79, -79, arrowsTip,"e", g2);
-    	drawArrow(22, 22, 79, 79, arrowsTip,"e", g2);
+    	//last four states
+    	drawArrow(statesSize, 0, shortArrowLength, 0, arrowsTip, a_transition, g2);
+    	g2.translate(spaceBetweenStatesInLine, 0);
+    	drawArrow(xYFromBottomToTop, -xYFromBottomToTop, xYFromTopToBottom, -xYFromTopToBottom, arrowsTip, emptyTransition, g2);
+    	drawArrow(xYFromBottomToTop, xYFromBottomToTop, xYFromTopToBottom, xYFromTopToBottom, arrowsTip, emptyTransition, g2);
     	drawState(g2, statesSize, 8);
-    	    	
-    	
-    	g2.translate(100, -100);
-    	drawArrow(22, 22, 79, 79, arrowsTip,"e", g2);
-    	drawCycleArrow(g2, statesSize, "a", -statesSize );
+
+		//top state
+    	g2.translate(spaceBetweenStatesInLine, toTopFromMidst);
+    	drawArrow(xYFromBottomToTop, xYFromBottomToTop, xYFromTopToBottom, xYFromTopToBottom, arrowsTip, emptyTransition, g2);
+    	drawCycleArrow(g2, statesSize, a_transition, -statesSize, arrowsTip );
     	drawState(g2, statesSize, 9);
-    	
-    	g2.translate(0, 200);
-    	drawArrow(22, -22, 79, -79, arrowsTip,"e", g2);
-    	drawCycleArrow(g2, statesSize, "b", statesSize );
+
+		//bottom state
+    	g2.translate(0, toBottomOfImageFromTop);
+    	drawArrow(xYFromBottomToTop, -xYFromBottomToTop, xYFromTopToBottom, -xYFromTopToBottom, arrowsTip, emptyTransition, g2);
+    	drawCycleArrow(g2, statesSize, b_transition, statesSize, arrowsTip );
     	drawState(g2, statesSize, 10);
     	
-    	g2.translate(100, -100);
+    	g2.translate(spaceBetweenStatesInLine, toMidstFromBottom);
     	drawState(g2, statesSize, 11);
-    	drawArrow(30, 0, 100-statesSize, 0, arrowsTip,"", g2);	
-    	//konec prvnich 4 vztahu
-    	
+    	drawArrow(statesSize, 0, shortArrowLength, 0, arrowsTip,"", g2);
+    	//last four states
+
+		//return to the original transformation
     	g2.setTransform(original);
     }
     
@@ -183,12 +245,10 @@ public class DrawingPanel extends JPanel {
      * @param symbol		symbol of transition
      * @param yMove			how much move circle up or down
      */
-    private void drawCycleArrow(Graphics2D g2, double r, String symbol, double yMove) {
+    private void drawCycleArrow(Graphics2D g2, double r, String symbol, double yMove, double tip_length) {
     		
     	g2.draw(new Ellipse2D.Double(-r,-r+yMove, 2*r, 2*r));
-    	int tip_lenght = 10;
-    	double c = tip_lenght * Math.cos(45);
-    			
+    	double c = tip_length * Math.cos(45);
     	if(yMove < 0 ) {
     		r = -r;
     	}
@@ -207,18 +267,11 @@ public class DrawingPanel extends JPanel {
      * @param y1		starting y-coordinate
      * @param x2		end x-coordinate
      * @param y2		end y-coordinate
-     * @param tip_length	lenght of the tip
+     * @param tip_length	length of the tip
      * @param symbol		symbol of the transition
      * @param g2			drawing library
      */
 	private void drawArrow(double x1, double y1, double x2, double y2, double tip_length, String symbol, Graphics2D g2) {
-		// TODO Auto-generated method stub
-		double scale_x = this.getWidth()/ x2;		
-		double scale_y = this.getHeight() / y2;
-		
-		double scale = Math.min(scale_x, scale_y); //spolecne meritko
-		
-		
 		g2.setColor(Color.BLACK);
 		double u_x = x2-x1;
 		double u_y = y2-y1;
@@ -230,7 +283,7 @@ public class DrawingPanel extends JPanel {
 		Stroke original = g2.getStroke();
 		
 		g2.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND,
-				BasicStroke.CAP_BUTT));
+				BasicStroke.JOIN_MITER));
 		g2.draw(new Line2D.Double(x1 ,y1 , (x2 - u_x*3), (y2 - u_y*3)));
 		
 		// smer kolmy (jednotkova delka)
@@ -256,27 +309,32 @@ public class DrawingPanel extends JPanel {
 		double stringY = y2-y1;
 		int xShift = 0;
 		int yShift = 0;
-		
+
+		// magical numbers - find them out during testing
 		if(x1 == x2) {
 			xShift = -5;
 		}else if (y1 == y2) {
 			yShift = -5;
 		}else if (x1<x2 && y1<y2) {
 			yShift = -2;
-		}else if (x1 < x2 && y1 > y2) {
+		}else if (x1 < x2) {
 			xShift = -20;
 			yShift = 10;
 		}
-		
 		g2.drawString(symbol, (float)stringX+xShift, (float)stringY+yShift);
 		g2.setStroke(original);
-		
 	}
 
-
+	/**
+	 * Change set of colors
+	 * and repaint the image
+	 * @param colors	set of colors
+	 */
 	public void setColors(Color[] colors){
-		this.statesColor=colors;
-		repaint();
+		if(colors.length == this.statesColor.length) {
+			this.statesColor = colors;
+			repaint();
+		}
 	}
     
 }
