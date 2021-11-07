@@ -47,6 +47,7 @@ public class Main {
         JLabel descTextLabel = new JLabel();
         descTextLabel.setText("Ovladani: vstup: aA/bB | reset: r/R");
 
+        JLabel accepted = new JLabel("NEAKCEPTOVÁN");
         Automat auto = new Automat();
 
         textField.addKeyListener(new KeyListener() {
@@ -85,6 +86,11 @@ public class Main {
                         }
                         break;
                 }
+                if(auto.isEndState()){
+                    accepted.setText("AKCEPTOVÁN");
+                }else{
+                    accepted.setText("NEAKCEPTOVÁN");
+                }
                 textLabel.setText(textField.getText());
                 drawingPanel.setColors(convertToColors(auto.getActivations()));
                 drawingPanel.setEndState(auto.isEndState());
@@ -92,12 +98,23 @@ public class Main {
         	
         });
         JLabel output = new JLabel(" Výstup: ");
-        bottomPanel.add(descTextLabel);
-        bottomPanel.add(textField);
-        bottomPanel.add(output);
-        bottomPanel.add(textLabel);
 
-        frame.add(bottomPanel, BorderLayout.SOUTH);
+        Box unitePanel = Box.createVerticalBox();
+
+        JPanel bottomPanel2 = new JPanel();
+        bottomPanel2.add(accepted);
+
+        JPanel bottomPanel3 = new JPanel();
+        bottomPanel3.add(descTextLabel);
+        bottomPanel2.add(output);
+        bottomPanel2.add(textLabel);
+        bottomPanel.add(textField);
+
+
+        unitePanel.add(bottomPanel3);
+        unitePanel.add(bottomPanel2);
+        unitePanel.add(bottomPanel);
+        frame.add(unitePanel, BorderLayout.SOUTH);
         frame.pack();
 	}
 
