@@ -3,11 +3,9 @@ package main;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.jar.JarEntry;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  * Main class of an project
@@ -46,6 +44,8 @@ public class Main {
         JTextField textField = new JTextField();
         textField.setColumns(10);
 
+        JLabel descTextLabel = new JLabel();
+        descTextLabel.setText("Ovladani: vstup: aA/bB | reset: r/R");
 
         Automat auto = new Automat();
 
@@ -91,9 +91,12 @@ public class Main {
             }
         	
         });
-
-        bottomPanel.add(textLabel);
+        JLabel output = new JLabel(" Výstup: ");
+        bottomPanel.add(descTextLabel);
         bottomPanel.add(textField);
+        bottomPanel.add(output);
+        bottomPanel.add(textLabel);
+
         frame.add(bottomPanel, BorderLayout.SOUTH);
         frame.pack();
 	}

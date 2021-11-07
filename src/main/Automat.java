@@ -9,7 +9,7 @@ import java.util.Stack;
 public class Automat {
 
     /** how many group of states */
-    static final int STATE_COUNT = 10;
+    static final int STATE_COUNT = 11;
 
     /** how many  single states */
     static final int MICRO_STATE_COUNT = 12;
@@ -94,6 +94,7 @@ public class Automat {
         //J
         activations[9][9] = true;
         activations[9][11] = true;
+
     }
 
     /**
@@ -153,6 +154,10 @@ public class Automat {
         //J - ,J
         transitions[9][0] = -1;
         transitions[9][1] = cc('J');
+
+        // non-acceptance state
+        transitions[10][0] = -1;
+        transitions[10][1] = -1;
     }
 
     /**
@@ -163,13 +168,19 @@ public class Automat {
         statesHistory.push(state);
         int nextState = transitions[state][i];
         System.out.println("From "+(char)(state+'A')+" to "+(char)(nextState+'A')+" using symbol "+(char)(i+'a'));
-        if (nextState==-1){
+        /*if (nextState==-1){
             //reset to zero?
             state = 0;
             //reset();
             //System.out.println("idk");
         }else {
             state = nextState;
+        }*/
+
+        if(state != 10){
+            if(nextState ==-1 ) state = 10;
+
+            else state = nextState;
         }
     }
 

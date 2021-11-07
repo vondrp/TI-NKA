@@ -1,10 +1,5 @@
 package main;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -37,6 +32,8 @@ public class DrawingPanel extends JPanel {
 	/**	how much from midst can be center of the state draw*/
 	private final int LIMIT_Y_FROM_MIDST = 100;
 
+	/**	font size of the text */
+	private final int FONT_SIZE = 20;
 	/**	width necessary for drawing an image */
 	private final int width;
 
@@ -232,10 +229,19 @@ public class DrawingPanel extends JPanel {
 		g2.draw(state);
 		g2.setColor(this.statesColor[index]);
 		g2.fill(state);
-		
+
+		Font original = g2.getFont();
+		g2.setFont(new Font("Calibri", Font.BOLD, FONT_SIZE));
+
+		String text = ""+(index+1);
+		int w = g2.getFontMetrics().stringWidth(text);
+		int h = g2.getFontMetrics().getHeight();
+
 		g2.setColor(origColor);
 		g2.setStroke(origStroke);
-		g2.drawString(""+(index+1), 0, 0);
+		g2.drawString(text, -w/2, (h/4));
+
+		g2.setFont(original);
     }
     
     /**
@@ -258,7 +264,13 @@ public class DrawingPanel extends JPanel {
 		tip.lineTo(0, r+yMove);
 		tip.lineTo(( - c), (r+yMove -c));
 		g2.draw(tip);
-		g2.drawString(symbol, (float) 0.0, (float)(r +yMove -8) );
+
+		Font originalFont = g2.getFont();
+		int w = g2.getFontMetrics().stringWidth(symbol);
+
+		g2.setFont(new Font("Calibri", Font.BOLD, FONT_SIZE));
+		g2.drawString(symbol, (float) -w/2, (float)(r +yMove -8) );
+		g2.setFont(originalFont);
     }
     
     /**
@@ -310,6 +322,9 @@ public class DrawingPanel extends JPanel {
 		int xShift = 0;
 		int yShift = 0;
 
+		Font originalFont = g2.getFont();
+		g2.setFont(new Font("Calibri", Font.BOLD, FONT_SIZE));
+
 		// magical numbers - find them out during testing
 		if(x1 == x2) {
 			xShift = -5;
@@ -323,6 +338,7 @@ public class DrawingPanel extends JPanel {
 		}
 		g2.drawString(symbol, (float)stringX+xShift, (float)stringY+yShift);
 		g2.setStroke(original);
+		g2.setFont(originalFont);
 	}
 
 	/**
