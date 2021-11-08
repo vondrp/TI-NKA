@@ -3,31 +3,30 @@ package main;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.jar.JarEntry;
 
 import javax.swing.*;
 
 /**
- * Main class of an project
+ * Main class of a project
  */
 public class Main {
 
+    /** length of last processed string */
+    private static int stringLength = 0;
     /**
      * @param args  no entry parameters
      */
 	public static void main(String[] args) {
 		JFrame frame = new JFrame();
-        
-        // Titulek okna
+
         frame.setTitle("TI - NKA (a*+b*)ababa(a*+b*)");
         frame.setSize(800, 400);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        // Umisti okno doprostred obrazovky
+        // relocate window to center of the monitor
         frame.setLocationRelativeTo(null);    
-        
-        // Zobrazi okno
+
         frame.setVisible(true);  
     
         DrawingPanel drawingPanel = new DrawingPanel();
@@ -45,7 +44,7 @@ public class Main {
         textField.setColumns(10);
 
         JLabel descTextLabel = new JLabel();
-        descTextLabel.setText("Ovladani: vstup: aA/bB | reset: r/R");
+        descTextLabel.setText("Ovládání: vstup: aA/bB | reset: r/R");
 
         JLabel accepted = new JLabel("NEAKCEPTOVÁN");
         Automat auto = new Automat();
@@ -60,32 +59,51 @@ public class Main {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                switch(e.getKeyChar()){
-                    case 'a':
-                    case 'A':
-                        auto.input(0);
-                        break;
-                    case 'b':
-                    case 'B':
-                        auto.input(1);
-                        break;
-                    case 'r':
-                    case 'R':
-                        auto.reset();
-                        textField.setText("");
-                        textLabel.setText("");
-                        break;
-                    case  KeyEvent.VK_BACK_SPACE:
-                        auto.backwards();
-                        break;
-                    default:
-                        if(textField.getText().length() == 1) {
-                            textField.setText("");
-                        }else {
-                            textField.setText(textField.getText().substring(0, textField.getText().length() - 1));
-                        }
-                        break;
+
+                int toProcess = textField.getText().length() - stringLength;
+
+                String substring = "";
+                if(toProcess>0) {
+                    substring = textField.getText().substring(stringLength);
                 }
+                while(Math.abs(toProcess)>0) {
+                    char symbol;
+                    if(toProcess>0) {
+                         symbol = substring.charAt(toProcess - 1);
+                    }else{
+                        symbol = KeyEvent.VK_BACK_SPACE;
+                    }
+                    switch (symbol) {
+                        case 'a':
+                        case 'A':
+                            auto.input(0);
+                            break;
+                        case 'b':
+                        case 'B':
+                            auto.input(1);
+                            break;
+                        case 'r':
+                        case 'R':
+                            auto.reset();
+                            textField.setText("");
+                            textLabel.setText("");
+                            break;
+                        case KeyEvent.VK_BACK_SPACE:
+                            auto.backwards();
+                            break;
+                        default:
+                            if (textField.getText().length() == 1) {
+                                textField.setText("");
+                            } else {
+                                textField.setText(textField.getText().substring(0, textField.getText().length() - 1));
+                            }
+                            break;
+                    }
+                    if(toProcess>0) toProcess--;
+                    else toProcess++;
+                }
+
+                stringLength = textField.getText().length();
                 if(auto.isEndState()){
                     accepted.setText("AKCEPTOVÁN");
                 }else{
