@@ -109,6 +109,7 @@ public class DrawingPanel extends JPanel {
     	super.paint(g);
     	this.g2 = (Graphics2D) g;
 
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     	if(endState)
     		g2.drawImage(endImage,0,0,this.getWidth(),this.getHeight()-40,null);
 
