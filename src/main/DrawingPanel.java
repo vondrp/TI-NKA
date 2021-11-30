@@ -17,7 +17,9 @@ import javax.swing.JPanel;
  */
 public class DrawingPanel extends JPanel {
 
-    @Serial
+	private final static String TITLE_IMAGE = "./end.jpg";
+
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	/**	radius of the states circle */
@@ -76,8 +78,8 @@ public class DrawingPanel extends JPanel {
     		statesColor[i] = Color.WHITE;
     	}
 		try {
-			endImage = ImageIO.read(new File("end.jpg"));
-		} catch (IOException e) {
+			endImage = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(TITLE_IMAGE));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
     	
@@ -225,7 +227,7 @@ public class DrawingPanel extends JPanel {
     	g2.setStroke(new BasicStroke(5));
     	
     	Color origColor = g2.getColor();
-    	g2.setColor(Color.BLACK);
+		g2.setColor(endState?Color.white:Color.black);
     	Ellipse2D.Double state = new Ellipse2D.Double(-r, -r, 2*r, 2*r);
 		g2.draw(state);
 		g2.setColor(this.statesColor[index]);
@@ -240,6 +242,7 @@ public class DrawingPanel extends JPanel {
 
 		g2.setColor(origColor);
 		g2.setStroke(origStroke);
+		g2.setColor(this.statesColor[index]!=Color.WHITE?Color.white:Color.black);
 		g2.drawString(text, -w/2, (h/4));
 
 		g2.setFont(original);
@@ -269,6 +272,7 @@ public class DrawingPanel extends JPanel {
 		Font originalFont = g2.getFont();
 		int w = g2.getFontMetrics().stringWidth(symbol);
 
+		g2.setColor(endState?Color.white:Color.black);
 		g2.setFont(new Font("Calibri", Font.BOLD, FONT_SIZE));
 		g2.drawString(symbol, (float) -w/2, (float)(r +yMove -8) );
 		g2.setFont(originalFont);
@@ -285,7 +289,7 @@ public class DrawingPanel extends JPanel {
      * @param g2			drawing library
      */
 	private void drawArrow(double x1, double y1, double x2, double y2, double tip_length, String symbol, Graphics2D g2) {
-		g2.setColor(Color.BLACK);
+		g2.setColor(endState?Color.white:Color.black);
 		double u_x = x2-x1;
 		double u_y = y2-y1;
 		double u_len1 = 1 / Math.sqrt(u_x * u_x + u_y * u_y);

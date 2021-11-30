@@ -8,16 +8,21 @@ import java.util.Stack;
  */
 public class Automat {
 
-    /** how many group of states */
+    /** number of states of deterministic finite automaton (DFA) */
     static final int STATE_COUNT = 11;
 
-    /** how many  single states */
+    /** number of states of non-deterministic finite automaton (NFA) */
     static final int MICRO_STATE_COUNT = 12;
 
     /** size of used alphabet */
     static final int ALPHABET_SIZE = 2;
 
-    /** status of states activations */
+    /** status of states activations
+     * each deterministic state consists of several non-deterministic states
+     * for every deterministic state it contains an array of possible non-deterministic states
+     *
+     * usage: canBeInMicroState = activations[currentState][microStateIndex]
+     */
     boolean[][] activations;
 
     /** number of the current state
@@ -29,10 +34,12 @@ public class Automat {
     private final Stack<Integer> statesHistory = new Stack<>();
 
     /** transitions for states
-     *  first dimension represents
-     *  a state and second one
-     *  has size of alphabet which
-     *  can be on the input
+     *
+     * For every state (based on first index)
+     * there exists an array of possible transitions (states)
+     * indexed by character input (second index)
+     *
+     * usage: newState = transitions[currentState][entered_character]
      */
     public int[][] transitions;
 
@@ -50,9 +57,8 @@ public class Automat {
     }
 
     /**
-     * for each group of states
-     * sets which of the micro states
-     * are going to be active
+     * for each state of deterministic finite automaton
+     * sets respective group of non-deterministic finite automaton states
      */
     private void setupMicroStates() {
         //A
@@ -111,47 +117,47 @@ public class Automat {
     }
 
     /**
-     * for all group of states
-     * set up their transitions
+     * for each DFA state
+     * set up its transition states based on character input
      */
     private void setupTransitions() {
-        //A - B,C
+        //A -> B,C
         transitions[0][0] = cc('B');
         transitions[0][1] = cc('C');
 
-        //B - B,D
+        //B -> B,D
         transitions[1][0] = cc('B');
         transitions[1][1] = cc('D');
 
-        //C - E,C
+        //C -> E,C
         transitions[2][0] = cc('E');
         transitions[2][1] = cc('C');
 
-        //D - F,
+        //D -> F,
         transitions[3][0] = cc('F');
         transitions[3][1] = -1;
 
-        //E - ,D
+        //E -> ,D
         transitions[4][0] = -1;
         transitions[4][1] = cc('D');
 
-        //F - ,G
+        //F -> ,G
         transitions[5][0] = -1;
         transitions[5][1] = cc('G');
 
-        //G - H,
+        //G -> H,
         transitions[6][0] = cc('H');
         transitions[6][1] = -1;
 
-        //H - I,J
+        //H -> I,J
         transitions[7][0] = cc('I');
         transitions[7][1] = cc('J');
 
-        //I - I,
+        //I -> I,
         transitions[8][0] = cc('I');
         transitions[8][1] = -1;
 
-        //J - ,J
+        //J -> ,J
         transitions[9][0] = -1;
         transitions[9][1] = cc('J');
 
