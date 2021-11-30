@@ -52,7 +52,43 @@ public class Main {
         textField.addKeyListener(new KeyListener() {
 
             @Override
-            public void keyTyped(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {
+                char validChar = 0;
+                switch (e.getKeyChar()) {
+                    case 'a':
+                    case 'A':
+                        validChar=e.getKeyChar();
+                        auto.input(0);
+                        break;
+                    case 'b':
+                    case 'B':
+                        validChar=e.getKeyChar();
+                        auto.input(1);
+                        break;
+                    case 'r':
+                    case 'R':
+                        auto.reset();
+                        textField.setText("");
+                        textLabel.setText("");
+                        e.consume();
+                        break;
+                    case 8:
+                        auto.backwards();
+                        break;
+                    default:
+                        e.consume();
+                        return;
+                }
+                if(auto.isEndState()){
+                    accepted.setText("AKCEPTOVÁN");
+                }else{
+                    accepted.setText("NEAKCEPTOVÁN");
+                }
+                textLabel.setText(textField.getText()+(validChar!=0?validChar:""));
+                drawingPanel.setColors(convertToColors(auto.getActivations()));
+                drawingPanel.setEndState(auto.isEndState());
+
+            }
 
             @Override
             public void keyPressed(KeyEvent e) { }
@@ -60,9 +96,16 @@ public class Main {
             @Override
             public void keyReleased(KeyEvent e) {
 
-                int toProcess = textField.getText().length() - stringLength;
+                //System.out.println("rel "+e.getKeyChar());
+               // int toProcess = textField.getText().length() - stringLength;
 
-                String substring = "";
+              /*  if(toProcess>0){
+                    if(!textField.getText().substring(0,lastString.length()-1).equals(lastString)){
+
+                    }
+                }*/
+
+             /*   String substring = "";
                 if(toProcess>0) {
                     substring = textField.getText().substring(stringLength);
                 }
@@ -103,15 +146,7 @@ public class Main {
                     else toProcess++;
                 }
 
-                stringLength = textField.getText().length();
-                if(auto.isEndState()){
-                    accepted.setText("AKCEPTOVÁN");
-                }else{
-                    accepted.setText("NEAKCEPTOVÁN");
-                }
-                textLabel.setText(textField.getText());
-                drawingPanel.setColors(convertToColors(auto.getActivations()));
-                drawingPanel.setEndState(auto.isEndState());
+                stringLength = textField.getText().length();*/
             }
         	
         });
