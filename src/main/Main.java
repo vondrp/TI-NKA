@@ -47,7 +47,6 @@ public class Main {
         frame.setMinimumSize(new Dimension(drawingPanel.getWidth(), drawingPanel.getHeight()));
         frame.setResizable(false);
 
-        JPanel bottomPanel = new JPanel();
         JLabel textLabel = new JLabel();
         JTextField textField = new JTextField();
         textField.setColumns(10);
@@ -132,11 +131,29 @@ public class Main {
 
         JPanel bottomPanel3 = new JPanel();
         bottomPanel3.add(descTextLabel);
+
+        JPanel bottomPanel = new JPanel();
         bottomPanel.add(textField);
+
+        JLabel authors = new JLabel("Autoři: Petr Vondrovic, Matěj Černý\n");
+        authors.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        JLabel yearOfProduction = new JLabel("2021");
+        yearOfProduction.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+
+        JPanel footer = new JPanel();
+        footer.setBackground(Color.GRAY);
+        footer.add(authors);
+        //footer.add(yearOfProduction, BorderLayout.AFTER_LAST_LINE);
+
+        JPanel footer2 = new JPanel();
+        footer2.setBackground(Color.GRAY);
+        footer2.add(yearOfProduction, BorderLayout.AFTER_LAST_LINE);
 
         unitePanel.add(bottomPanel3);
         unitePanel.add(bottomPanel2);
         unitePanel.add(bottomPanel);
+        unitePanel.add(footer);
+        unitePanel.add(footer2);
         frame.add(unitePanel, BorderLayout.SOUTH);
         frame.pack();
 	}

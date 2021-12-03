@@ -7,7 +7,6 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.Serial;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -15,7 +14,7 @@ import javax.swing.JPanel;
  */
 public class DrawingPanel extends JPanel {
 
-	private final static String TITLE_IMAGE = "./end.jpg";
+	//private final static String TITLE_IMAGE = "./end.jpg";
 
 	@Serial
 	private static final long serialVersionUID = 1L;
@@ -47,7 +46,7 @@ public class DrawingPanel extends JPanel {
     public Graphics2D g2;
 
 	/**	true - is an end state, otherwise false */
-    private boolean endState;
+    //private boolean endState;
 
 	/**	image used on the background during end state*/
     private BufferedImage endImage;
@@ -75,12 +74,13 @@ public class DrawingPanel extends JPanel {
     	for(int i = firstActive; i< statesColor.length; i++) {
     		statesColor[i] = Color.WHITE;
     	}
+		/*
 		try {
 			endImage = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(TITLE_IMAGE));
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-    	
+		}*/
+
     }
 
 	/**
@@ -101,7 +101,7 @@ public class DrawingPanel extends JPanel {
 	 * @param endState	status of end state
 	 */
 	public void setEndState(boolean endState) {
-		this.endState = endState;
+		//this.endState = endState;
 	}
 
 	@Override
@@ -110,9 +110,9 @@ public class DrawingPanel extends JPanel {
     	this.g2 = (Graphics2D) g;
 
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    	if(endState)
+    	/*if(endState)
     		g2.drawImage(endImage,0,0,this.getWidth(),this.getHeight()-40,null);
-
+			*/
 
 		int arrowsTip = 10;
     	int statesSize = STATES_R;
@@ -225,7 +225,8 @@ public class DrawingPanel extends JPanel {
     	g2.setStroke(new BasicStroke(5));
     	
     	Color origColor = g2.getColor();
-		g2.setColor(endState?Color.white:Color.black);
+		//g2.setColor(endState?Color.white:Color.black);
+		g2.setColor(Color.black);
     	Ellipse2D.Double state = new Ellipse2D.Double(-r, -r, 2*r, 2*r);
 		g2.draw(state);
 		g2.setColor(this.statesColor[index]);
@@ -238,12 +239,14 @@ public class DrawingPanel extends JPanel {
 		int w = g2.getFontMetrics().stringWidth(text);
 		int h = g2.getFontMetrics().getHeight();
 
-		g2.setColor(origColor);
-		g2.setStroke(origStroke);
+
 		g2.setColor(this.statesColor[index]!=Color.WHITE?Color.white:Color.black);
+
 		g2.drawString(text, -w/2, (h/4));
 
 		g2.setFont(original);
+		g2.setColor(origColor);
+		g2.setStroke(origStroke);
     }
     
     /**
@@ -270,7 +273,7 @@ public class DrawingPanel extends JPanel {
 		Font originalFont = g2.getFont();
 		int w = g2.getFontMetrics().stringWidth(symbol);
 
-		g2.setColor(endState?Color.white:Color.black);
+		//g2.setColor(endState?Color.white:Color.black);
 		g2.setFont(new Font("Calibri", Font.BOLD, FONT_SIZE));
 		g2.drawString(symbol, (float) -w/2, (float)(r +yMove -8) );
 		g2.setFont(originalFont);
@@ -287,7 +290,7 @@ public class DrawingPanel extends JPanel {
      * @param g2			drawing library
      */
 	private void drawArrow(double x1, double y1, double x2, double y2, double tip_length, String symbol, Graphics2D g2) {
-		g2.setColor(endState?Color.white:Color.black);
+		//g2.setColor(endState?Color.white:Color.black);
 		double u_x = x2-x1;
 		double u_y = y2-y1;
 		double u_len1 = 1 / Math.sqrt(u_x * u_x + u_y * u_y);
