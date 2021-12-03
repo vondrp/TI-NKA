@@ -161,7 +161,7 @@ public class Automat {
         transitions[9][0] = -1;
         transitions[9][1] = cc('J');
 
-        // non-acceptance state
+        // rejected state
         transitions[10][0] = -1;
         transitions[10][1] = -1;
     }
@@ -174,15 +174,6 @@ public class Automat {
         statesHistory.push(state);
         int nextState = transitions[state][i];
         System.out.println("From "+(char)(state+'A')+" to "+(char)(nextState+'A')+" using symbol "+(char)(i+'a'));
-        /*if (nextState==-1){
-            //reset to zero?
-            state = 0;
-            //reset();
-            //System.out.println("idk");
-        }else {
-            state = nextState;
-        }*/
-
         if(state != 10){
             if(nextState ==-1 ) state = 10;
 
@@ -219,5 +210,12 @@ public class Automat {
     public boolean isEndState() {
         // H, I, J
         return state >= 7 && state <= 9;
+    }
+
+    /**
+     * @return  if state is rejected one
+     */
+    public boolean isRejectedState(){
+        return state == 10;
     }
 }

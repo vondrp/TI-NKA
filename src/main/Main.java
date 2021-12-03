@@ -11,8 +11,6 @@ import javax.swing.*;
  */
 public class Main {
 
-    /** length of last processed string */
-    private static int stringLength = 0;
     /**
      * @param args  no entry parameters
      */
@@ -21,24 +19,35 @@ public class Main {
 
         frame.setTitle("TI - NKA (a*+b*)ababa(a*+b*)");
         frame.setSize(800, 400);
-        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        // relocate window to center of the monitor
-        frame.setLocationRelativeTo(null);    
+        //frame.setLocationRelativeTo(null); //relocate window to center of the monitor
+        frame.setVisible(true);
 
-        frame.setVisible(true);  
-    
+        Box topPanel = Box.createVerticalBox();
+        JLabel titleLabel = new JLabel("Simulace " +
+                "činnosti nedeterministického rozpoznávacího automatu");
+        titleLabel.setFont(new Font("Helvetica Neue", Font.PLAIN, 25));
+        titleLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        JTextArea descLabel = new JTextArea();
+        descLabel.setText("Nedeterministický rozpoznávací automat rozhoduje, zda zadaný vstupní řetězec vyhovuje zadanému regulárnímu výrazu.   \n" +
+                "Červeně vybarvené stavy znázorňují množinu stavů, do kterých může být automat v různých výpočtech převeden.\n" +
+                "V jednom z těchto stavů se tedy v konkrétním výpočtu v dané fázi zpracování řetězce automat bude nacházet. \n" +
+                "Řetězec vyhovuje regulárnímu výrazu právě tehdy, existuje-li výpočet, který jej převede do koncového stavu, tedy\n" +
+                "je-li koncový stav vybarven.");
+        descLabel.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
+        descLabel.setMargin(new Insets(2,50,2,2));
+
+        topPanel.add(titleLabel, BorderLayout.NORTH);
+        topPanel.add(descLabel, BorderLayout.SOUTH);
+        frame.add(topPanel, BorderLayout.NORTH);
+
         DrawingPanel drawingPanel = new DrawingPanel();
         drawingPanel.setPreferredSize(new Dimension(drawingPanel.getWidth(), drawingPanel.getHeight()));
-
         frame.add(drawingPanel, BorderLayout.CENTER);
-
         frame.setMinimumSize(new Dimension(drawingPanel.getWidth(), drawingPanel.getHeight()));
-
         frame.setResizable(false);
-        JPanel bottomPanel = new JPanel();
 
+        JPanel bottomPanel = new JPanel();
         JLabel textLabel = new JLabel();
         JTextField textField = new JTextField();
         textField.setColumns(10);
@@ -47,6 +56,7 @@ public class Main {
         descTextLabel.setText("Ovládání: vstup: aA/bB | reset: r/R");
 
         JLabel accepted = new JLabel("NEAKCEPTOVÁN");
+        accepted.setFont(new Font("Helvetica Neue", Font.PLAIN, 20));
         Automat auto = new Automat();
 
         textField.addKeyListener(new KeyListener() {
@@ -79,11 +89,23 @@ public class Main {
                         e.consume();
                         return;
                 }
+
                 if(auto.isEndState()){
                     accepted.setText("AKCEPTOVÁN");
+                    accepted.setForeground(Color.GREEN);
+                }else if(auto.isRejectedState()){
+                    accepted.setText("ZAMÍTNUT");
+                    accepted.setForeground(Color.RED);
+                    auto.reset();
+                    textLabel.setText(textField.getText()+(validChar!=0?validChar:""));
+                    textField.setText("");
+                    e.consume();
+                    return;
                 }else{
                     accepted.setText("NEAKCEPTOVÁN");
+                    accepted.setForeground(Color.BLACK);
                 }
+
                 textLabel.setText(textField.getText()+(validChar!=0?validChar:""));
                 drawingPanel.setColors(convertToColors(auto.getActivations()));
                 drawingPanel.setEndState(auto.isEndState());
@@ -96,73 +118,21 @@ public class Main {
             @Override
             public void keyReleased(KeyEvent e) {
 
-                //System.out.println("rel "+e.getKeyChar());
-               // int toProcess = textField.getText().length() - stringLength;
-
-              /*  if(toProcess>0){
-                    if(!textField.getText().substring(0,lastString.length()-1).equals(lastString)){
-
-                    }
-                }*/
-
-             /*   String substring = "";
-                if(toProcess>0) {
-                    substring = textField.getText().substring(stringLength);
-                }
-                while(Math.abs(toProcess)>0) {
-                    char symbol;
-                    if(toProcess>0) {
-                         symbol = substring.charAt(toProcess - 1);
-                    }else{
-                        symbol = KeyEvent.VK_BACK_SPACE;
-                    }
-                    switch (symbol) {
-                        case 'a':
-                        case 'A':
-                            auto.input(0);
-                            break;
-                        case 'b':
-                        case 'B':
-                            auto.input(1);
-                            break;
-                        case 'r':
-                        case 'R':
-                            auto.reset();
-                            textField.setText("");
-                            textLabel.setText("");
-                            break;
-                        case KeyEvent.VK_BACK_SPACE:
-                            auto.backwards();
-                            break;
-                        default:
-                            if (textField.getText().length() == 1) {
-                                textField.setText("");
-                            } else {
-                                textField.setText(textField.getText().substring(0, textField.getText().length() - 1));
-                            }
-                            break;
-                    }
-                    if(toProcess>0) toProcess--;
-                    else toProcess++;
-                }
-
-                stringLength = textField.getText().length();*/
             }
         	
         });
-        JLabel output = new JLabel(" Výstup: ");
+        JLabel output = new JLabel(" Zpracovaný řetězec: ");
 
         Box unitePanel = Box.createVerticalBox();
 
         JPanel bottomPanel2 = new JPanel();
+        bottomPanel2.add(output);
+        bottomPanel2.add(textLabel);
         bottomPanel2.add(accepted);
 
         JPanel bottomPanel3 = new JPanel();
         bottomPanel3.add(descTextLabel);
-        bottomPanel2.add(output);
-        bottomPanel2.add(textLabel);
         bottomPanel.add(textField);
-
 
         unitePanel.add(bottomPanel3);
         unitePanel.add(bottomPanel2);
