@@ -107,7 +107,6 @@ public class Main {
 
                 textLabel.setText(textField.getText()+(validChar!=0?validChar:""));
                 drawingPanel.setColors(convertToColors(auto.getActivations()));
-                drawingPanel.setEndState(auto.isEndState());
 
             }
 
@@ -169,5 +168,4 @@ public class Main {
             out[i] = activations[i]?Color.RED:Color.WHITE;
         return out;
     }
-
 }

@@ -4,7 +4,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
-import java.awt.image.BufferedImage;
 import java.io.Serial;
 
 import javax.swing.JPanel;
@@ -45,13 +44,6 @@ public class DrawingPanel extends JPanel {
     /** Graphics2D  */
     public Graphics2D g2;
 
-	/**	true - is an end state, otherwise false */
-    //private boolean endState;
-
-	/**	image used on the background during end state*/
-    private BufferedImage endImage;
-
-
     /**
      * Create instance of the drawing panel
      */
@@ -74,13 +66,6 @@ public class DrawingPanel extends JPanel {
     	for(int i = firstActive; i< statesColor.length; i++) {
     		statesColor[i] = Color.WHITE;
     	}
-		/*
-		try {
-			endImage = ImageIO.read(this.getClass().getClassLoader().getResourceAsStream(TITLE_IMAGE));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-
     }
 
 	/**
@@ -97,12 +82,6 @@ public class DrawingPanel extends JPanel {
 		return this.height;
 	}
 
-	/**
-	 * @param endState	status of end state
-	 */
-	public void setEndState(boolean endState) {
-		//this.endState = endState;
-	}
 
 	@Override
     public void paint(Graphics g) {
@@ -110,9 +89,6 @@ public class DrawingPanel extends JPanel {
     	this.g2 = (Graphics2D) g;
 
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    	/*if(endState)
-    		g2.drawImage(endImage,0,0,this.getWidth(),this.getHeight()-40,null);
-			*/
 
 		int arrowsTip = 10;
     	int statesSize = STATES_R;
