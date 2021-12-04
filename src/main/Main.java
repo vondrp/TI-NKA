@@ -12,16 +12,14 @@ import javax.swing.*;
 public class Main {
 
     /**
-     * @param args  no entry parameters
+     * The entry point of application.
+     *
+     * @param args no entry parameters
      */
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
+    public static void main(String[] args) {
+        JFrame frame = new JFrame();
 
         frame.setTitle("TI - NKA (a*+b*)ababa(a*+b*)");
-        frame.setSize(800, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setLocationRelativeTo(null); //relocate window to center of the monitor
-        frame.setVisible(true);
 
         Box topPanel = Box.createVerticalBox();
         JLabel titleLabel = new JLabel("Simulace " +
@@ -34,8 +32,10 @@ public class Main {
                 "V jednom z těchto stavů se tedy v konkrétním výpočtu v dané fázi zpracování řetězce automat bude nacházet. \n" +
                 "Řetězec vyhovuje regulárnímu výrazu právě tehdy, existuje-li výpočet, který jej převede do koncového stavu, tedy\n" +
                 "je-li koncový stav vybarven.");
+        descLabel.setEnabled(false);
+        descLabel.setDisabledTextColor(Color.black);
         descLabel.setAlignmentX(JTextArea.CENTER_ALIGNMENT);
-        descLabel.setMargin(new Insets(2,50,2,2));
+        descLabel.setMargin(new Insets(2, 50, 2, 2));
 
         topPanel.add(titleLabel, BorderLayout.NORTH);
         topPanel.add(descLabel, BorderLayout.SOUTH);
@@ -56,69 +56,9 @@ public class Main {
 
         JLabel accepted = new JLabel("NEAKCEPTOVÁN");
         accepted.setFont(new Font("Helvetica Neue", Font.PLAIN, 20));
-        Automat auto = new Automat();
 
-        textField.addKeyListener(new KeyListener() {
+        setupAutomatInputControl(textField, accepted, textLabel, drawingPanel);
 
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char validChar = 0;
-                switch (e.getKeyChar()) {
-                    case 'a':
-                    case 'A':
-                        validChar=e.getKeyChar();
-                        auto.input(0);
-                        break;
-                    case 'b':
-                    case 'B':
-                        validChar=e.getKeyChar();
-                        auto.input(1);
-                        break;
-                    case 'r':
-                    case 'R':
-                        auto.reset();
-                        textField.setText("");
-                        textLabel.setText("");
-                        e.consume();
-                        break;
-                    case 8:
-                        auto.backwards();
-                        break;
-                    default:
-                        e.consume();
-                        return;
-                }
-
-                if(auto.isEndState()){
-                    accepted.setText("AKCEPTOVÁN");
-                    accepted.setForeground(Color.GREEN);
-                }else if(auto.isRejectedState()){
-                    accepted.setText("ZAMÍTNUT");
-                    accepted.setForeground(Color.RED);
-                    auto.reset();
-                    textLabel.setText(textField.getText()+(validChar!=0?validChar:""));
-                    textField.setText("");
-                    e.consume();
-                    return;
-                }else{
-                    accepted.setText("NEAKCEPTOVÁN");
-                    accepted.setForeground(Color.BLACK);
-                }
-
-                textLabel.setText(textField.getText()+(validChar!=0?validChar:""));
-                drawingPanel.setColors(convertToColors(auto.getActivations()));
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) { }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-        	
-        });
         JLabel output = new JLabel(" Zpracovaný řetězec: ");
 
         Box unitePanel = Box.createVerticalBox();
@@ -142,7 +82,6 @@ public class Main {
         JPanel footer = new JPanel();
         footer.setBackground(Color.GRAY);
         footer.add(authors);
-        //footer.add(yearOfProduction, BorderLayout.AFTER_LAST_LINE);
 
         JPanel footer2 = new JPanel();
         footer2.setBackground(Color.GRAY);
@@ -155,17 +94,100 @@ public class Main {
         unitePanel.add(footer2);
         frame.add(unitePanel, BorderLayout.SOUTH);
         frame.pack();
-	}
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null); //relocate window to center of the monitor
+        frame.setVisible(true);
+
+
+    }
 
     /**
      * According to array of booleans set colors for the drawing
-     * @param activations   activations of the states
-     * @return              color representation of active/inactive states
+     *
+     * @param activations activations of the states
+     * @return color representation of active/inactive states
      */
-    private static Color[] convertToColors(boolean[] activations){
+    private static Color[] convertToColors(boolean[] activations) {
         Color[] out = new Color[activations.length];
         for (int i = 0; i < activations.length; i++)
-            out[i] = activations[i]?Color.RED:Color.WHITE;
+            out[i] = activations[i] ? Color.RED : Color.WHITE;
         return out;
+    }
+
+    /**
+     * Setup user interface with Automat
+     * @param textField user Input
+     * @param accepted label with state of Automat
+     * @param textLabel processed string from user
+     * @param drawingPanel panel that draws Automat
+     */
+    private static void setupAutomatInputControl(JTextField textField, JLabel accepted, JLabel textLabel, DrawingPanel drawingPanel) {
+        Automat auto = new Automat();
+
+        textField.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+                textField.setCaretPosition(textField.getDocument().getLength());
+                char validChar = 0;
+                switch (e.getKeyChar()) {
+                    case 'a':
+                    case 'A':
+                        validChar = e.getKeyChar();
+                        auto.input(0);
+                        break;
+                    case 'b':
+                    case 'B':
+                        validChar = e.getKeyChar();
+                        auto.input(1);
+                        break;
+                    case 'r':
+                    case 'R':
+                        auto.reset();
+                        textField.setText("");
+                        textLabel.setText("");
+                        e.consume();
+                        break;
+                    case 8:
+                        auto.backwards();
+                        break;
+                    default:
+                        e.consume();
+                        return;
+                }
+
+                if (auto.isEndState()) {
+                    accepted.setText("AKCEPTOVÁN");
+                    accepted.setForeground(Color.GREEN);
+                } else if (auto.isRejectedState()) {
+                    accepted.setText("ZAMÍTNUT");
+                    accepted.setForeground(Color.RED);
+                    auto.reset();
+                    textLabel.setText(textField.getText() + (validChar != 0 ? validChar : ""));
+                    textField.setText("");
+                    drawingPanel.setColors(convertToColors(auto.getActivations()));
+                    e.consume();
+                    return;
+                } else {
+                    accepted.setText("NEAKCEPTOVÁN");
+                    accepted.setForeground(Color.BLACK);
+                }
+
+                textLabel.setText(textField.getText() + (validChar != 0 ? validChar : ""));
+                drawingPanel.setColors(convertToColors(auto.getActivations()));
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+
+        });
     }
 }

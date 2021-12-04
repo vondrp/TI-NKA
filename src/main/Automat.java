@@ -3,42 +3,53 @@ package main;
 import java.util.Stack;
 
 /**
- * Class Automat represents a representation
- * of a finite automaton
+ * Class Automat represents deterministic finite automaton with states
+ * created from non-deterministic finite automaton with 'microstates'
  */
 public class Automat {
 
-    /** number of states of deterministic finite automaton (DFA) */
-    static final int STATE_COUNT = 11;
+    /**
+     * number of states of deterministic finite automaton (DFA)
+     */
+    private static final int STATE_COUNT = 11;
 
-    /** number of states of non-deterministic finite automaton (NFA) */
-    static final int MICRO_STATE_COUNT = 12;
+    /**
+     * number of states of non-deterministic finite automaton (NFA)
+     */
+    private static final int MICRO_STATE_COUNT = 12;
 
-    /** size of used alphabet */
-    static final int ALPHABET_SIZE = 2;
+    /**
+     * size of used alphabet
+     */
+    private static final int ALPHABET_SIZE = 2;
 
-    /** status of states activations
+    /**
+     * status of states activations
      * each deterministic state consists of several non-deterministic states
      * for every deterministic state it contains an array of possible non-deterministic states
-     *
+     * <p>
      * usage: canBeInMicroState = activations[currentState][microStateIndex]
      */
-    boolean[][] activations;
+    private boolean[][] activations;
 
-    /** number of the current state
+    /**
+     * number of the current state
      * can be imagined as from A to J
      */
     private int state;
 
-    /** history of states */
+    /**
+     * history of states
+     */
     private final Stack<Integer> statesHistory = new Stack<>();
 
-    /** transitions for states
-     *
+    /**
+     * transitions for states
+     * <p>
      * For every state (based on first index)
      * there exists an array of possible transitions (states)
      * indexed by character input (second index)
-     *
+     * <p>
      * usage: newState = transitions[currentState][entered_character]
      */
     public int[][] transitions;
@@ -50,7 +61,7 @@ public class Automat {
     public Automat() {
         this.activations = new boolean[STATE_COUNT][MICRO_STATE_COUNT];
         this.transitions = new int[STATE_COUNT][ALPHABET_SIZE];
-        state=0;
+        state = 0;
 
         setupMicroStates();
         setupTransitions();
@@ -105,14 +116,15 @@ public class Automat {
 
     /**
      * Return integer representation of a char
-     * @param c     input char
-     * @return      integer value of the char
+     *
+     * @param c input char
+     * @return integer value of the char
      */
-    private static int cc(char c){
-        if(c>='a')
-            c-='a';
-        else if(c>='A')
-            c-='A';
+    private static int cc(char c) {
+        if (c >= 'a')
+            c -= 'a';
+        else if (c >= 'A')
+            c -= 'A';
         return c;
     }
 
@@ -168,44 +180,49 @@ public class Automat {
 
     /**
      * Read the input and change accordingly to it current state
-     * @param i     input
+     *
+     * @param i input
      */
-    public void input(int i){
+    public void input(int i) {
         statesHistory.push(state);
         int nextState = transitions[state][i];
-        System.out.println("From "+(char)(state+'A')+" to "+(char)(nextState+'A')+" using symbol "+(char)(i+'a'));
-        if(state != 10){
-            if(nextState ==-1 ) state = 10;
+        System.out.println("From " + (char) (state + 'A') + " to " + (char) (nextState + 'A') + " using symbol " + (char) (i + 'a'));
+        if (state != 10) {
+            if (nextState == -1) state = 10;
 
             else state = nextState;
         }
     }
 
     /**
-     * @return  how are states activated in their group
+     * Get activations boolean [ ].
+     *
+     * @return how are states activated in their group
      */
-    public boolean[] getActivations(){
+    public boolean[] getActivations() {
         return activations[state];
     }
 
     /**
      * reset finite automaton to default state
      */
-    public void reset(){
-        state=0;
+    public void reset() {
+        state = 0;
         statesHistory.clear();
     }
 
     /**
      * return to the previous state
      */
-    public void backwards(){
-        if(!statesHistory.isEmpty())
+    public void backwards() {
+        if (!statesHistory.isEmpty())
             state = statesHistory.pop();
     }
 
     /**
-     * @return  if the state is one of the end states
+     * Is end state boolean.
+     *
+     * @return if the state is one of the end states
      */
     public boolean isEndState() {
         // H, I, J
@@ -213,9 +230,12 @@ public class Automat {
     }
 
     /**
-     * @return  if state is rejected one
+     * Is rejected state boolean.
+     *
+     * @return if state is rejected one
      */
-    public boolean isRejectedState(){
+    public boolean isRejectedState() {
+        // state rejected state
         return state == 10;
     }
 }
